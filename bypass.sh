@@ -1,7 +1,7 @@
 #!/system/bin/sh
 
 # ==== VALIDASI KEY ONLINE ====
-KEY_URL="https://raw.githubusercontent.com/username/repo/main/keys.txt"
+KEY_URL="https://raw.githubusercontent.com/danysfahmi21/Loader-ab/main/keys.txt"
 KEY_USER="$1"  # Key dari loader
 
 echo "🔑 CEK KEY ONLINE KONTOL... 🖕"
