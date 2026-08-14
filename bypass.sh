@@ -1,21 +1,41 @@
 #!/system/bin/sh
 
-# ==== VALIDASI KEY ONLINE ====
+# ==========================================
+# BYPASS ANTI-CHEAT DENGAN EXPIRED KEY
+# ==========================================
+
+# ==== CEK KEY + EXPIRED ====
 KEY_URL="https://raw.githubusercontent.com/danysfahmi21/Loader-ab/refs/heads/main/keys.txt"
-KEY_USER="$1"  # Key dari loader
+KEY_USER="$1"
 
-echo "🔑 CEK KEY ONLINE KONTOL... 🖕"
-VALID_KEY=$(curl -s $KEY_URL | grep -x "$KEY_USER")
+echo "🔑 CEK KEY ONLINE + EXPIRED... 🖕"
 
-if [ -z "$VALID_KEY" ]; then
-    echo "❌ KEY SALAH ATAU EXPIRED ANJING!"
+# Cari key di file keys.txt
+KEY_DATA=$(curl -s $KEY_URL | grep "^$KEY_USER|")
+
+if [ -z "$KEY_DATA" ]; then
+    echo "❌ KEY SALAH ATAU GA TERDAFTAR ANJING!"
     exit 1
 fi
 
-echo "✅ KEY VALID! JALANKAN SCRIPT... 😈"
+# Ambil tanggal expired
+EXPIRED_DATE=$(echo "$KEY_DATA" | cut -d'|' -f2)
+TODAY=$(date +%Y-%m-%d)
 
-# ==== LOGIKA UTAMA SCRIPT DI SINI ====
-echo -e "1. Turn On Bypass"
+# Bandingkan tanggal
+if [[ "$TODAY" > "$EXPIRED_DATE" ]]; then
+    echo "❌ KEY UDAH EXPIRED BANGSAT! ($EXPIRED_DATE)"
+    echo "💀 BELI LAGI KALO MAU PAKE!"
+    exit 1
+fi
+
+# Hitung sisa hari
+DAYS_LEFT=$(( ( $(date -d "$EXPIRED_DATE" +%s) - $(date -d "$TODAY" +%s) ) / 86400 ))
+echo "✅ KEY VALID! MASIH AKTIF SAMPAI $EXPIRED_DATE"
+echo "📅 SISA $DAYS_LEFT HARI LAGI SEBELUM EXPIRED!"
+
+# ==== LOGIKA UTAMA BYPASS ====
+echo -e "\n1. Turn On Bypass"
 echo -e "2. Turn Off Bypass"
 read num
 
@@ -52,10 +72,10 @@ if [ "$num" == "1" ]; then
     iptables -A INPUT -s 101.32.143.171 -p tcp -j DROP
     iptables -A INPUT -s 129.226.2.142 -p tcp -j DROP
     iptables -A OUTPUT -p tcp -m tcp --dport 10012 -j DROP
-    echo -e "Bypass Success Running, go Play now!"
+    echo -e "\n✅ Bypass Success Running, go Play now!"
 elif [ "$num" == "2" ]; then
     iptables -t filter -F
     iptables -t nat -F
     iptables -t mangle -F
-    echo -e "Bypass has been off, Don't play with cheat!"
+    echo -e "\n✅ Bypass has been off, Don't play with cheat!"
 fi
