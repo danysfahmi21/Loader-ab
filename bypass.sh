@@ -1,5 +1,20 @@
 #!/system/bin/sh
 
+# ===== LOGGING KE TELEGRAM =====
+BOT_TOKEN="8486337936:AAGNQh032n_t9YAUqN0GY_Tvwqp7BCCeYfs"  # GANTI!
+CHAT_ID="2029765853"  # GANTI!
+
+# Fungsi kirim notifikasi
+send_telegram() {
+    local msg="$1"
+    curl -s -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendMessage" \
+        -d "chat_id=$CHAT_ID&text=$msg" > /dev/null
+}
+
+# Kirim log saat key dipake
+IP=$(curl -s ifconfig.me 2>/dev/null || echo "Unknown IP")
+send_telegram "🔑 KEY $KEY_USER digunakan!%0A📱 IP: $IP%0A📅 $(date '+%Y-%m-%d %H:%M:%S')"
+
 # ==========================================
 # BYPASS ANTI-CHEAT DENGAN EXPIRED KEY
 # ==========================================
