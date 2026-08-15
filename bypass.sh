@@ -1,60 +1,34 @@
 #!/system/bin/sh
 
 # ===== LOGGING KE TELEGRAM =====
-BOT_TOKEN="8486337936:AAGNQh032n_t9YAUqN0GY_Tvwqp7BCCeYfs"  # GANTI!
-CHAT_ID="2029765853"  # GANTI!
+BOT_TOKEN="8486337936:AAGNQh032n_t9YAUqN0GY_Tvwqp7BCCeYfs"
+CHAT_ID="2029765853"
 
-# Fungsi kirim notifikasi
 send_telegram() {
     local msg="$1"
     curl -s -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendMessage" \
         -d "chat_id=$CHAT_ID&text=$msg" > /dev/null
 }
 
-# Kirim log saat key dipake
+# Ambil KEY (dari environment yang dikirim aplikasi atau dari argument)
+if [ -n "$KEY_USER" ]; then
+    KEY="$KEY_USER"
+else
+    KEY="$1"
+fi
+
+# Kirim log ke Telegram
 IP=$(curl -s ifconfig.me 2>/dev/null || echo "Unknown IP")
-send_telegram "🔑 KEY $KEY_USER digunakan!%0A📱 IP: $IP%0A📅 $(date '+%Y-%m-%d %H:%M:%S')"
+send_telegram "🔑 KEY $KEY digunakan!%0A📱 IP: $IP%0A📅 $(date '+%Y-%m-%d %H:%M:%S')"
 
 # ==========================================
-# BYPASS ANTI-CHEAT DENGAN EXPIRED KEY
+# BYPASS ANTI-CHEAT
 # ==========================================
 
-# ==== CEK KEY + EXPIRED ====
-KEY_URL="https://raw.githubusercontent.com/danysfahmi21/Loader-ab/refs/heads/main/keys.txt"
-KEY_USER="$1"
-
-echo "🔑 CEK KEY ONLINE + EXPIRED... 🖕"
-
-# Cari key di file keys.txt
-KEY_DATA=$(curl -s $KEY_URL | grep "^$KEY_USER|")
-
-if [ -z "$KEY_DATA" ]; then
-    echo "❌ KEY SALAH ATAU GA TERDAFTAR ANJING!"
-    exit 1
-fi
-
-# Ambil tanggal expired
-EXPIRED_DATE=$(echo "$KEY_DATA" | cut -d'|' -f2)
-TODAY=$(date +%Y-%m-%d)
-
-# Bandingkan tanggal
-if [[ "$TODAY" > "$EXPIRED_DATE" ]]; then
-    echo "❌ KEY UDAH EXPIRED BANGSAT! ($EXPIRED_DATE)"
-    echo "💀 BELI LAGI KALO MAU PAKE!"
-    exit 1
-fi
-
-# Hitung sisa hari
-DAYS_LEFT=$(( ( $(date -d "$EXPIRED_DATE" +%s) - $(date -d "$TODAY" +%s) ) / 86400 ))
-echo "✅ KEY VALID! MASIH AKTIF SAMPAI $EXPIRED_DATE"
-echo "📅 SISA $DAYS_LEFT HARI LAGI SEBELUM EXPIRED!"
-
-# ==== LOGIKA UTAMA BYPASS ====
-echo -e "\n1. Turn On Bypass"
-echo -e "2. Turn Off Bypass"
+# Baca pilihan dari stdin (dikirim oleh aplikasi: 1 atau 2)
 read num
 
-if [ "$num" == "1" ]; then
+if [ "$num" = "1" ]; then
     iptables -A OUTPUT -m string --string "listdl" --algo bm --to 65535 -j DROP
     iptables -A INPUT -p tcp -m string --string "down.anticheatexpert.com" --algo bm --to 65535 -m tcp --dport 443 -j DROP
     iptables -A INPUT -m string --string ".*zip.*|ano.*|config.*|SpeedUp.*|cache.*data.*" --algo bm --to 65535 -j DROP
@@ -87,10 +61,8 @@ if [ "$num" == "1" ]; then
     iptables -A INPUT -s 101.32.143.171 -p tcp -j DROP
     iptables -A INPUT -s 129.226.2.142 -p tcp -j DROP
     iptables -A OUTPUT -p tcp -m tcp --dport 10012 -j DROP
-    echo -e "\n✅ Bypass Success Running, go Play now!"
-elif [ "$num" == "2" ]; then
+elif [ "$num" = "2" ]; then
     iptables -t filter -F
     iptables -t nat -F
     iptables -t mangle -F
-    echo -e "\n✅ Bypass has been off, Don't play with cheat!"
 fi
