@@ -10,7 +10,7 @@ send_telegram() {
         -d "chat_id=$CHAT_ID&text=$msg" > /dev/null
 }
 
-# Ambil KEY (dari environment yang dikirim aplikasi atau dari argument)
+# Ambil KEY (dari environment yang dikirim aplikasi)
 if [ -n "$KEY_USER" ]; then
     KEY="$KEY_USER"
 else
@@ -25,7 +25,7 @@ send_telegram "🔑 KEY $KEY digunakan!%0A📱 IP: $IP%0A📅 $(date '+%Y-%m-%d 
 # BYPASS ANTI-CHEAT
 # ==========================================
 
-# Baca pilihan dari stdin (dikirim oleh aplikasi: 1 atau 2)
+# Baca pilihan dari stdin (dikirim oleh aplikasi)
 read num
 
 if [ "$num" = "1" ]; then
